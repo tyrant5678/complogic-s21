@@ -33,10 +33,14 @@ by a smaller ST expression (similarly).
 -/
 
 -- YOUR DATA TYPE DEFINITION HERE
-inductive SalmonTrout : string → Type
-| "salmon" (e : SalmonTrout)
+inductive SalmonTrout : Type
+| salmon (e : SalmonTrout)
+| trout (e : SalmonTrout)
+| empty
 
-#reduce SalmonTrout.mk "salmon" (SalmonTrout.mk "trout")
+open SalmonTrout
+
+/-
 Now assume that the *meaning* of a 
 given ST expression, e, is a  pair,
 p = prod.mk s t (which in Lean can 
@@ -63,7 +67,14 @@ be recursive.
 -/
 
 -- YOUR EVAL AND HELPER FUNCIONS HERE
-def fishEval : SalmonTrout → 
+
+def fishEvalHelper : SalmonTrout → prod nat nat → prod nat nat
+| SalmonTrout.empty (prod.mk s t) := prod.mk s t
+| (salmon e) (prod.mk s t) := fishEvalHelper e (prod.mk (s+1) t)
+| (trout e) (prod.mk s t) := fishEvalHelper e (prod.mk s (t+1))
+
+def fishEval : SalmonTrout → prod nat nat
+| e := fishEvalHelper e (0, 0)
 /-
  WRITE SOME TEST CASES
 
@@ -73,6 +84,13 @@ def fishEval : SalmonTrout →
     an expression with three salmon
     and two trout.
 -/
+def e1 := salmon (trout (salmon (empty)))
+def e2 := SalmonTrout.empty
+def e3 := salmon (salmon (salmon(trout (trout (empty)))))
+
+#reduce fishEval e1
+#reduce fishEval e2
+#reduce fishEval e3
 
 /-
 2. [25 points] polymorphic functions 
@@ -188,7 +206,8 @@ structure box (α : Type u) : Type u :=
 (val : α)
 
 -- YOUR FUNCTION HERE
-def liftF2Box (α β : Type u) : (α → β) → (box α → box β) :=
+def liftF2Box {α β : Type u} : (α → β) → (box α → box β)
+| f (box.mk a) := box.mk (f a)
 -- WHEN YOU'VE GOT IT, THIS TEST SHOULD PASS
 
 #reduce (liftF2Box nat.succ) (box.mk 3) 
