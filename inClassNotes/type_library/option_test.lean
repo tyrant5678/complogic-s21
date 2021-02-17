@@ -19,11 +19,18 @@ Examples:
 -/
 
 -- We can express f in Lean like this
-def f : bool → nat
+def f : Π (b:bool), nat
 | ff := 0
 | tt := 1
 
+-- OR
+
+def f' : bool → nat
+| tt := 1
+| ff := 0
+
 -- But if we try p the same way it's an error
+-- This is a non-exhaustive match, Lean FORCES a function to be total
 def p : bool → nat
 | tt := 1
 

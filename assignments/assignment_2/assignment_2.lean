@@ -33,8 +33,10 @@ by a smaller ST expression (similarly).
 -/
 
 -- YOUR DATA TYPE DEFINITION HERE
+inductive SalmonTrout : string → Type
+| "salmon" (e : SalmonTrout)
 
-/-
+#reduce SalmonTrout.mk "salmon" (SalmonTrout.mk "trout")
 Now assume that the *meaning* of a 
 given ST expression, e, is a  pair,
 p = prod.mk s t (which in Lean can 
@@ -45,7 +47,7 @@ of occurrences of "salmon" in e, and
 t is the number of occurrences of 
 "trout." 
 
-Implement the semantics of ST as a 
+Iplement the semantics of ST as a 
 function, fishEval, that takes an
 expression e : ST and returns its
 meaning as the correct pair. Hint: 
@@ -56,12 +58,12 @@ argument along with an initial (s,t)
 pair, with fishEval passing it (0,0)
 as an initial value. Remember to 
 use the "by cases" syntax, as you 
-will want your helper function to 
+will want your mhelper function to 
 be recursive.
 -/
 
 -- YOUR EVAL AND HELPER FUNCIONS HERE
-
+def fishEval : SalmonTrout → 
 /-
  WRITE SOME TEST CASES
 
@@ -89,7 +91,10 @@ with the name, id.
 -/
 
 -- YOUR ANSWER HERE
+universe u
 
+def id' {α : Type u}: α → α
+| a := a
 
 /-
 When you've succeded, the following
@@ -100,7 +105,6 @@ values passed as the arguments: .
 #reduce id' nat
 #reduce id' Type
 #reduce id' (Type 1)
-
 
 /- 3. [25 points] Partial functions 
 
@@ -148,7 +152,9 @@ represent this partial function.
 -/
 
 -- YOUR ANSWER HERE
-
+def id_partial : bool → option bool
+| tt := some tt
+| ff := none
 /-
 TEST YOUR FUNCTION
 Use #eval or #reduce to show that your
@@ -157,7 +163,8 @@ argument values.
 -/
 
 -- HERE
-
+#reduce id_partial tt
+#reduce id_partial ff
 
 /- 
 4. [25 points] Higher-order functions 
@@ -181,7 +188,7 @@ structure box (α : Type u) : Type u :=
 (val : α)
 
 -- YOUR FUNCTION HERE
-
+def liftF2Box (α β : Type u) : (α → β) → (box α → box β) :=
 -- WHEN YOU'VE GOT IT, THIS TEST SHOULD PASS
 
 #reduce (liftF2Box nat.succ) (box.mk 3) 
