@@ -259,6 +259,11 @@ def map_box : Π {α β : Type u}, (α → β) → box α → box β :=
 λ (α β:Type u) (f : α → β),
   λ b,
     box.mk (f b.val)
+
+def map_box' : Π {α β : Type u}, (α → β) → box α → box β
+| a b f bo := box.mk (f bo.val)
+
+#reduce map_box' (nat.add 5) (box.mk 2345)
 /-
 14. 
 Write a function, map_option, that
