@@ -261,7 +261,7 @@ def map_box : Π {α β : Type u}, (α → β) → box α → box β :=
     box.mk (f b.val)
 
 def map_box' : Π {α β : Type u}, (α → β) → box α → box β
-| a b f bo := box.mk (f bo.val)
+| _ _ f bo := box.mk (f bo.val)
 
 #reduce map_box' (nat.add 5) (box.mk 2345)
 /-
