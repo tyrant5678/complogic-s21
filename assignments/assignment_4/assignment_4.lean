@@ -12,6 +12,17 @@ is to return true (tt) if and only there is some
 tt value in the list.
 -/
 
+def map_list {α β : Type} : (α → β) → list α → list β
+| _ list.nil := list.nil 
+| f (h::t) := ((f h)::(map_list f t))
+
+def someSatisfiesHelper : list bool → bool
+| list.nil := ff
+| (tt::t) := tt
+| (ff::t) := someSatisfiesHelper t
+
+def someSatisfies {α : Type} : (α → bool) → list α → bool
+| f l := someSatisfiesHelper (map_list f l)
 /-
 2.  Write a polymorphic function, allSatisfy, 
 that takes a a predicate function, p, of type 
@@ -25,6 +36,14 @@ then pass to a helper function, the job of which
 is to return true (tt) if and only every value
 in the list is tt. 
 -/
+
+def allSatisfyHelper : list bool → bool
+| list.nil := tt
+| (ff::t) := ff
+| (tt::t) := allSatisfyHelper t
+
+def allSatisfy {α : Type} : (α → bool) → list α → bool
+| f l := allSatisfyHelper (map_list f l)
 
 /-
 3. Write a function called simple_fold_list.
@@ -43,7 +62,12 @@ Here are two examples:
 simple_fold_list nat.add 0 [1,2,3,4,5] = 15
 simple_fold_list nat.mul 1 [1,2,3,4,5] = 120
 -/
+def simple_fold_list {α : Type} : (α → α → α) → α → list α → α
+| _ i list.nil := i
+| f i (h::t) := f h (simple_fold_list f i t)
 
+#eval simple_fold_list nat.add 0 [1,2,3,4,5]
+#eval simple_fold_list nat.mul 1 [1,2,3,4,5]
 /-
 4. Write an application of simple_fold_list to
 reduce a list of strings to a single string in
@@ -55,12 +79,16 @@ to do so.
 For example, reduce ["Hello", " ", "Lean!"] to
 "Hello, Lean!"
 -/
-
+#eval simple_fold_list string.append "" ["Hello", " ", "Lean!"]
 /-
 5. Re-implement here your helpder functions from
 questions 1 and 2 using simple_fold_list.
 -/
+def someSatisfiesHelper' : list bool → bool
+| l := simple_fold_list bor ff l
 
+def allSatisfyHelper' : list bool → bool
+| l := simple_fold_list band tt l
 /-
 6. This question asks you to understand how to
 write inductive families in a slightly different
@@ -109,12 +137,12 @@ argument to ev_ind is impliict, and not that it
 can be inferred from the second argument.)
 -/
 
-def ev0 : ev 0 := _
-def ev2 : ev 2 := _
-def ev4 : ev 4 := _
-def ev6 : ev 6 := _
-def ev8 : ev 8 := _
-def ev10 : ev 10 := _
+def ev0 : ev 0 := ev_base
+def ev2 : ev 2 := ev_ind (ev_base)
+def ev4 : ev 4 := ev_ind (ev_ind (ev_base))
+def ev6 : ev 6 := ev_ind (ev_ind (ev_ind (ev_base)))
+def ev8 : ev 8 := ev_ind (ev_ind (ev_ind (ev_ind (ev_base))))
+def ev10 : ev 10 := ev_ind (ev_ind (ev_ind (ev_ind (ev_ind (ev_base)))))
 
 /-
 6B. You should have been able to give values for 
@@ -123,6 +151,10 @@ What single word can you use to indate that each
 of these types has at least one value?
 -/
 
+/-
+The single word that you can use to indicate that each of these types
+has at least one value is that these are all inhabited types.
+-/
 
 /-
 6C. Try to give values for each of the types in
@@ -138,6 +170,13 @@ def ev3 : ev 3 := _
 def ev5 : ev 5 := _
 
 /-
+You won't be able to do this because the way that ev is defined,
+you can only have an ev type n such that n is even. Thus, all of these
+ev n are impossible to create because the n is odd. The word that best describes
+this is uninhabited.
+-/
+ 
+/-
 6D. Define an inductive family, odd n, indexed by
 natural numbers, such that the type for every odd
 number has at least one value, and the types for
@@ -145,6 +184,15 @@ even numbers have no values. Then show that you
 can complete the preceding three definitions if you
 replace ev by odd.
 -/
+inductive odd : ℕ → Type
+| odd_base : odd 1
+| odd_ind  {n : nat} (oddn : odd n) : odd (n + 2)
+
+open odd
+
+def odd1 : odd 1 := odd_base
+def odd3 : odd 3 := odd_ind (odd_base)
+def odd5 : odd 5 := odd_ind (odd_ind (odd_base))
 
 /-
 7. As you know, the type, empty, is uninhabited.
@@ -168,10 +216,14 @@ question at the beginning of this problem.
 
 def foo : ev 1 → empty :=
 λ (e : ev 1),
-  _
+  match e with
+  end
+  
 
 def bar : ev 3 → empty :=
-_
+λ (e : ev 3),
+  λ (e' : 
+
 
 def baz : ev 5 → empty :=
 _
@@ -195,5 +247,5 @@ problem). Then briefly answer the question,
 in what sense does mkEvp have a dependent
 function type? 
 -/
-
+def mkEvp {n : ℕ} : ev n → evdp
 -- Your answers here
