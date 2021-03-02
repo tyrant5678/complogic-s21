@@ -222,7 +222,7 @@ def foo : ev 1 → empty :=
 
 def bar : ev 3 → empty :=
 λ (e : ev 3),
-  λ (e' : 
+  λ (e' : ev 1),
 
 
 def baz : ev 5 → empty :=
@@ -238,7 +238,7 @@ respectively, 0, 2, and 4.
 -/
 
 -- Your answers here
-
+structure evdp : Σ (n : ℕ), ev n
 /- 9. Write a function, mkEvp, that takes 
 a argument, n, of type nat, implicitly, and 
 an argument, nEv ot type, ev n, and that 
