@@ -222,12 +222,24 @@ def foo : ev 1 → empty :=
 
 def bar : ev 3 → empty :=
 λ (e : ev 3),
-  λ (e' : ev 1),
-
+  match e with
+  | (ev_ind e') := match e' with
+                   end
+  end
 
 def baz : ev 5 → empty :=
-_
-
+λ (e : ev 5),
+  match e with
+  | (ev_ind e') := match e' with
+                  | (ev_ind e'') := match e'' with
+                                    end
+                   end
+  end
+/-
+If we know that we can construct a function that returns
+something of type empty, that tells us that this type is
+uninhabited as well.
+-/
 /- 8. Define evdp to be a sigma (dependent 
 pair) type, avalue of which has a natural
 number, n,  as its first component, and a 
@@ -238,7 +250,9 @@ respectively, 0, 2, and 4.
 -/
 
 -- Your answers here
-structure evdp : Σ (n : ℕ), ev n
+inductive evdp : Σ (n : ℕ), ev n
+
+
 /- 9. Write a function, mkEvp, that takes 
 a argument, n, of type nat, implicitly, and 
 an argument, nEv ot type, ev n, and that 
