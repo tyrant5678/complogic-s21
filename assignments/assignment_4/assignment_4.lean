@@ -250,7 +250,12 @@ respectively, 0, 2, and 4.
 -/
 
 -- Your answers here
-inductive evdp : Σ (n : ℕ), ev n
+
+def evdp := Σ (n : ℕ), ev n
+
+def evdp0 : evdp := ⟨0, ev0⟩
+def evdp2 : evdp := ⟨2, ev2⟩
+def evdp4 : evdp := ⟨4, ev4⟩
 
 
 /- 9. Write a function, mkEvp, that takes 
@@ -261,5 +266,15 @@ problem). Then briefly answer the question,
 in what sense does mkEvp have a dependent
 function type? 
 -/
-def mkEvp {n : ℕ} : ev n → evdp
+
 -- Your answers here
+
+def mkEvp {n : ℕ} : ev n → evdp
+| nEv := ⟨n, nEv⟩
+
+/-
+mkEvp has a dependent function type because the type of the function
+changes depending on what value of n is passed. For example, if you
+pass n=0, then the type of the function is ev 0 → evdp. If you pass
+n=2, then the type of the function is ev 2 → evdp, and so on.
+-/
