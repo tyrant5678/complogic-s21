@@ -93,7 +93,7 @@ should return [1,2,3,4,5].
 -- ANSWER HERE
 def filterZeros : list nat → list nat
 | list.nil := list.nil
-| (list.cons 0 (list.cons th t)) := list.cons th (filterZeros t)
+| (list.cons 0 t) := filterZeros t
 | (list.cons h t) := list.cons h (filterZeros t)
 
 /-
