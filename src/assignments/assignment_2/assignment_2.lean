@@ -124,6 +124,7 @@ values passed as the arguments: .
 #reduce id' Type
 #reduce id' (Type 1)
 
+Θ
 /- 3. [25 points] Partial functions 
 
 This question requires you to read 

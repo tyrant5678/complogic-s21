@@ -50,27 +50,27 @@ A semigroup is a groupoid in which the operator is *associative*
 
 @[class]
 structure mul_semigroup (α : Type u) extends mul_groupoid α :=
-(assoc : ∀ (a b c_1 : α), mul a (mul b c_1) = mul (mul a b) c_1)
+(mul_assoc : ∀ (a b c_1 : α), mul a (mul b c_1) = mul (mul a b) c_1)
 -- the above is a Type.... AND a Proposition
 -- in Lean, propositions are types!
 -- assoc is a proof of this proposition
 -- (a * (b * c)) == ((a * b ) * c)
 @[class]
 structure add_semigroup (α : Type u) extends add_groupoid α :=
-(assoc : ∀ (a b c_1 : α), add a (add b c_1) = add (add a b) c_1)
+(add_assoc : ∀ (a b c_1 : α), add a (add b c_1) = add (add a b) c_1)
 
 /-
 A monoid is a semigroup with an identity element
 -/
 @[class]
 structure mul_monoid (α : Type u) extends mul_semigroup α, has_one α :=
-(ident_left : ∀ (a : α), mul one a = a)
-(ident_right: ∀ (a: α), mul a one = a)
+(mul_ident_left : ∀ (a : α), mul one a = a)
+(mul_ident_right: ∀ (a: α), mul a one = a)
 
 @[class]
 structure add_monoid (α : Type u) extends add_semigroup α, has_zero α :=
-(ident_left : ∀ (a : α), add zero a = a)
-(ident_right: ∀ (a: α), add a zero = a)
+(add_ident_left : ∀ (a : α), add zero a = a)
+(add_ident_right: ∀ (a: α), add a zero = a)
 
 /-
 A group is a mul_semigroup in which every element has an inverse
@@ -90,11 +90,11 @@ A group is commutative, or abelian, if its operator is commutative.
 -/
 @[class]
 structure mul_comm_group (α : Type u) extends mul_group α :=
-(comm : ∀ (a b : α), mul a b = mul b a )
+(mul_comm : ∀ (a b : α), mul a b = mul b a )
 
 @[class]
 structure add_comm_group (α : Type u) extends add_group α :=
-(comm : ∀ (a b : α), add a b = add b a )
+(add_comm : ∀ (a b : α), add a b = add b a )
 
 /-
 You can keep going to define a whole hierarchy of algebraic
