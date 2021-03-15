@@ -1,3 +1,4 @@
+import algebra
 -- test import
 #check semigroup
 #check has_one
