@@ -32,8 +32,9 @@ expresses the claim that the integers (ℤ or
 the required proofs with *sorry*. 
 -/
 @[class]
-structure myRing (α : Type u) extends add_comm_group α :=
-(mul_dist : ∀ (a b c : α), mul a (add b c) = add (mul a b) (mul a c))
+structure myRing (α : Type u) extends alg.add_comm_group α, mul_monoid α :=
+(mul_dist_left : ∀ (a b c : α), mul a (add b c) = add (mul a b) (mul a c))
+(mul_dist_right : ∀ (a b c : α), mul (add b c) a =  add (mul b a) (mul c a))
 
 /-
 2. Go learn what an algebraic *field* is, then
@@ -45,6 +46,10 @@ may (and should) stub out the proof fields in
 your instances using sorry.
 -/
 
+@[class]
+structure myField (α : Type u) extends myRing α :=
+(add_inv : ∀ (a : α), a ≠ zero → ∃ (b : α), add a b = zero)
+(mul_inv : ∀ (a : α), a ≠ zero → ∃ (b : α), mul a b = one)
 
 /-
 3. Graduate students required. Undergrads extra
@@ -128,6 +133,8 @@ functions to implement your solution.
 open alg
 
 -- Your answer here
+def mul_map_reduce {α β: Type} [alg.mul_monoid β] : (α → β) → list α → β
+| f l := mul_monoid_foldr (fmap f l)
 
 
 
@@ -139,7 +146,7 @@ values in the list
 [1,0,2,0,3,0,4].
 -/
 
-#eval mul_map_reduce  _ [1,0,2,0,3,0,4]
+#eval mul_map_reduce (λ (n : nat), if n = 0 then 1 else n) [1,0,2,0,3,0,4]
 -- expect 24
 
 /-
@@ -156,7 +163,7 @@ easier.
 
 inductive nat_eql: nat → nat → Type
 | zeros_equal : nat_eql 0 0
-| n_succ_m_succ_equal : Π {n m : nat}, _
+| n_succ_m_succ_equal : Π {n m : nat}, nat_eql n.succ m.succ
 
 /-
 B. Now either complete the following programs
@@ -166,10 +173,11 @@ won't be possible.
 
 open nat_eql
 
-def eq_0_0 : nat_eql 0 0 := _
+def eq_0_0 : nat_eql 0 0 := zeros_equal
+-- Defining a type of nat_eql 0 1 is impossible because this is an unihabited type b/c 0 ≠ 1
 def eq_0_1 : nat_eql 0 1 := _
-def eq_1_1 : nat_eql 1 1 := _
-def eq_2_2 : nat_eql 2 2 := _
+def eq_1_1 : nat_eql 1 1 := n_succ_m_succ_equal
+def eq_2_2 : nat_eql 2 2 := n_succ_m_succ_equal
 
 /-
 C. The apply tactic in Lean's tactic language
