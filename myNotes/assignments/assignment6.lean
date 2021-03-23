@@ -6,7 +6,7 @@ merging Git conflicts :)
 -/
 import ...src.inClassNotes.typeclasses.functor
 import ..typeclasses.algebra
-
+import data.real.basic
 /-
 Copy this file to where you want to work on 
 it and then adjust the imports accordingly.
@@ -31,11 +31,22 @@ expresses the claim that the integers (ℤ or
 *int* in Lean) is a ring. You may "stub out"
 the required proofs with *sorry*. 
 -/
+
+set_option old_structure_cmd true
+
+
+instance add_group_nat : alg.add_group nat := ⟨sorry, sorry⟩
+
 @[class]
 structure myRing (α : Type u) extends alg.add_comm_group α, mul_monoid α :=
-(mul_dist_left : ∀ (a b c : α), mul a (add b c) = add (mul a b) (mul a c))
-(mul_dist_right : ∀ (a b c : α), mul (add b c) a =  add (mul b a) (mul c a))
+(dist_left : ∀ (a b c : α),
+ mul_groupoid.mul a (add_groupoid.add b c) =
+ add_groupoid.add (mul_groupoid.mul a b) (mul_groupoid.mul a c))
+(dist_right : ∀ (a b c : α),
+  mul_groupoid.mul (add_groupoid.add b c) a =
+  add_groupoid.add (mul_groupoid.mul b a) (mul_groupoid.mul c a))
 
+instance myRing_nat : myRing nat := ⟨ sorry, sorry, sorry, sorry, sorry ⟩
 /-
 2. Go learn what an algebraic *field* is, then
 define a typeclass to formalize its definition,
@@ -46,11 +57,44 @@ may (and should) stub out the proof fields in
 your instances using sorry.
 -/
 
+-- need to extend from add_comm_group and mul_monoid
 @[class]
-structure myField (α : Type u) extends myRing α :=
-(add_inv : ∀ (a : α), a ≠ zero → ∃ (b : α), add a b = zero)
-(mul_inv : ∀ (a : α), a ≠ zero → ∃ (b : α), mul a b = one)
+structure myField (α : Type u) extends myRing α, mul_monoid α:=
+(mul_comm : ∀ (a b : α), mul_groupoid.mul a b = mul_groupoid.mul b a)
+(mul_inv : ∀ (a : α), a ≠ alg.has_zero.zero → ∃ (b : α), mul_groupoid.mul a b = alg.has_one.one)
 
+-- need to define some prerequisite instances to make field def work
+-- in order to define an instance of myField, I must make the appropriate instances for
+-- ℚ so Lean has them in its lookup table
+instance has_one_q : alg.has_one ℚ := ⟨ 1 ⟩ 
+instance mul_groupoid_q : mul_groupoid ℚ := ⟨ sorry ⟩ 
+instance mul_semigroup_q : mul_semigroup ℚ  := ⟨ sorry ⟩ 
+instance mul_monoid_q : mul_monoid ℚ  := ⟨ sorry , sorry⟩ 
+
+instance has_zero_q : alg.has_zero ℚ := ⟨ 0 ⟩ 
+instance add_groupoid_q : add_groupoid ℚ := ⟨ sorry ⟩ 
+instance add_semigroup_q : alg.add_semigroup ℚ:= ⟨ sorry ⟩ 
+instance add_monoid_q : alg.add_monoid ℚ := ⟨ sorry ,sorry⟩ 
+instance add_group_q : alg.add_group ℚ := ⟨ sorry, sorry⟩
+/-
+This is the creation of a myField ℚ I mentioned earlier
+-/
+instance myField_ℚ : myField ℚ := ⟨ sorry, sorry, sorry, sorry, sorry, sorry, sorry ⟩
+/-
+Now we have to do the same thing for ℝ
+-/
+instance has_one_r : alg.has_one ℝ := ⟨ 1 ⟩ 
+instance mul_groupoid_r : mul_groupoid ℝ  := ⟨ sorry ⟩ 
+instance mul_semigroup_r : mul_semigroup ℝ  := ⟨ sorry ⟩ 
+instance mul_monoid_r : mul_monoid ℝ := ⟨ sorry , sorry⟩ 
+
+instance has_zero_r : alg.has_zero ℝ := ⟨ 0 ⟩ 
+instance add_groupoid_r : add_groupoid ℝ := ⟨ sorry ⟩ 
+instance add_semigroup_r : alg.add_semigroup ℝ := ⟨ sorry ⟩ 
+instance add_monoid_r : alg.add_monoid ℝ := ⟨ sorry ,sorry⟩ 
+instance add_group_r : alg.add_group ℝ := ⟨ sorry, sorry⟩
+
+instance myField_r : myField ℝ := ⟨ sorry, sorry, sorry, sorry, sorry, sorry, sorry ⟩
 /-
 3. Graduate students required. Undergrads extra
 credit. Go figure out what an algebraic module is
@@ -87,16 +131,16 @@ you need to multiply, using your mul function.
 
 def add : nat → nat → nat
 | 0 m         := m
-| (n' + 1) m  := 1 + (add n' m)
+| (nat.succ n') m  := nat.succ (add n' m)
 
 def mul : nat → nat → nat
 | 0 m         := 0
-| (n' + 1) m  := add m (mul n' m) 
+| (nat.succ n') m  := add m (mul n' m) 
 
 -- first arg raised to second
 def exp : nat → nat → nat 
 | n 0 := 1
-| n (m'+1) := mul n (exp n m')
+| n (nat.succ m') := mul n (exp n m')
 
 #eval exp 2 10    -- expect 1024
 
@@ -136,8 +180,6 @@ open alg
 def mul_map_reduce {α β: Type} [alg.mul_monoid β] : (α → β) → list α → β
 | f l := mul_monoid_foldr (fmap f l)
 
-
-
 /-
 B. Complete the given application of 
 mul_map_reduce with a lambda expression 
@@ -163,7 +205,7 @@ easier.
 
 inductive nat_eql: nat → nat → Type
 | zeros_equal : nat_eql 0 0
-| n_succ_m_succ_equal : Π {n m : nat}, nat_eql n.succ m.succ
+| n_succ_m_succ_equal: Π {n m : nat}  (smaller_succ : nat_eql n m) , nat_eql n.succ m.succ
 
 /-
 B. Now either complete the following programs
@@ -176,8 +218,8 @@ open nat_eql
 def eq_0_0 : nat_eql 0 0 := zeros_equal
 -- Defining a type of nat_eql 0 1 is impossible because this is an unihabited type b/c 0 ≠ 1
 def eq_0_1 : nat_eql 0 1 := _
-def eq_1_1 : nat_eql 1 1 := n_succ_m_succ_equal
-def eq_2_2 : nat_eql 2 2 := n_succ_m_succ_equal
+def eq_1_1 : nat_eql 1 1 := n_succ_m_succ_equal zeros_equal
+def eq_2_2 : nat_eql 2 2 := n_succ_m_succ_equal (n_succ_m_succ_equal zeros_equal)
 
 /-
 C. The apply tactic in Lean's tactic language
@@ -199,6 +241,17 @@ until you're done. Voila!
 
 def eq_10_10 : nat_eql 10 10 :=
 begin
+  apply n_succ_m_succ_equal _,
+  apply n_succ_m_succ_equal _,
+  apply n_succ_m_succ_equal _,
+  apply n_succ_m_succ_equal _,
+  apply n_succ_m_succ_equal _,
+  apply n_succ_m_succ_equal _,
+  apply n_succ_m_succ_equal _,
+  apply n_succ_m_succ_equal _,
+  apply n_succ_m_succ_equal _,
+  apply n_succ_m_succ_equal _,
+  exact zeros_equal
 end
 
 /-
@@ -215,6 +268,8 @@ ok with us.
 
 def eq_500_500 : nat_eql 500 500 :=
 begin
+  repeat {apply n_succ_m_succ_equal _},
+  exact zeros_equal
 end
 
 
@@ -259,10 +314,13 @@ test cases below should work.
 -/
 
 def nat_to_bool : nat → bool :=
-_
+λ (n : nat),
+  match n with
+  | 0 := ff
+  | n := tt
+  end
 
-instance nat_to_bool_coe : has_coe nat bool := 
-_
+instance nat_to_bool_coe : has_coe nat bool := ⟨ nat_to_bool ⟩
 
 def needs_bool : bool → bool := λ b, b
 
@@ -283,9 +341,11 @@ to apply the needs_bool function to any string,
 where the empty string returns ff and non-empty, 
 tt. 
 -/
+def string_to_nat : string → nat :=
+λ (s : string),
+  string.length s
 
-instance string_to_nat_coe : _ := 
-_
+instance string_to_nat_coe : has_coe string nat := ⟨ string_to_nat ⟩
 
 -- Test cases
 #eval needs_bool "Hello"  -- expect tt
