@@ -105,6 +105,7 @@ end
 
 
 /-
+-- NOTE: ≺ is just a standin for some relation (e.g. ≤, =, etc.)
 section relation
 variables {α : Sort u} {β : Sort v} (r : β → β → Prop)
 local infix `≺`:50 := r
@@ -117,7 +118,7 @@ def transitive := ∀ ⦃x y z⦄, x ≺ y → y ≺ z → x ≺ z
 
 def equivalence := reflexive r ∧ symmetric r ∧ transitive r
 
-def total := ∀ x y, x ≺ y ∨ y ≺ x
+def total := ∀ x y, x ≺ y ∨ y ≺ x -- not the same as a total function
 
 def mk_equivalence (rfl : reflexive r) (symm : symmetric r) (trans : transitive r) : equivalence r :=
 ⟨rfl, symm, trans⟩
@@ -139,12 +140,26 @@ lemma inv_image.trans (f : α → β) (h : transitive r) : transitive (inv_image
 lemma inv_image.irreflexive (f : α → β) (h : irreflexive r) : irreflexive (inv_image r f) :=
 λ (a : α) (h₁ : inv_image r f a a), h (f a) h₁
 
+-- tc stands for transitive closure
+-- this means   
 inductive tc {α : Sort u} (r : α → α → Prop) : α → α → Prop
 | base  : ∀ a b, r a b → tc a b
 | trans : ∀ a b c, tc a b → tc b c → tc a c
 end relation
 -/
 
-theorem eq_is_equiv : ∀ (α : Sort u), equivalence (@eq α)  := 
+theorem eq_is_equiv' : ∀ (α : Sort u), equivalence (@eq α)  := 
 begin
+  assume α,
+  unfold equivalence,
+  apply and.intro _ _,
+  exact eq.refl,
+  apply and.intro _ _,
+  unfold symmetric,
+  assume x y xy,
+  rw xy,
+  unfold transitive,
+  assume x y z xy yz,
+  rw xy,
+  rw yz,
 end
