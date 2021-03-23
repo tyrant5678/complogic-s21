@@ -236,7 +236,7 @@ Hint: Think *top down*. Write a single, simple
 expression that provides a complete solution
 *except* for the holes that remain to be filled.
 Then recursively "fill the holes". Continue 
-until you're done. Voila! 
+until you're done. Voila!  
 -/
 
 def eq_10_10 : nat_eql 10 10 :=
