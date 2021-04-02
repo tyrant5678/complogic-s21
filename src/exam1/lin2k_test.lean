@@ -18,7 +18,8 @@ vectr with values (4,6), (-6,2), and
 -/
 
 -- HERE
-
+def v1 : vectr := vectr 3 6
+#reduce v1
 /-
 1B. [10 points]
 
