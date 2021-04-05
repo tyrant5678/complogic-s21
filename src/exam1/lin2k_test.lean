@@ -40,7 +40,7 @@ v2 + (-1:K) • v1.)
 -/
 
 -- HERE 
-def v4 : vectr := 2*v1 - v2 +v3
+def v4 : vectr := (2:K) • v1 + (-1:K) • v2 +v3
 #eval v4
 /-
 Compute the correct answer by hand
@@ -87,7 +87,7 @@ drawing and upload it with your test.
 -/
 
 -- HERE
-
+-- PICTURE UPLOADED TO COLLAB ASSIGNMENT ALONG WITH LIN_2K TEST
 /-
 2. [15 points]
 
@@ -165,7 +165,8 @@ inverse, and briefly explain why.
 /-
 2 is not a field because 2 does not have a multiplicative
 inverse which is also contained within the set. The possible options for
-multiples are 0,1,2, and 3. 0•2=0≠1, 1•2=2≠1, 2•2=4%4=0≠1, 2•3=6%4=2≠1
+multiples are 0,1,2, and 3. 0 * 2 = 0 ≠ 1, 1 * 2 = 2 ≠ 1, 2 * 2 = 4 % 4 = 0 ≠ 1,
+2 * 3 = 6 % 4 = 2 ≠ 1
 Therefore, we have exhaustively shown that this cannot be a field as there are
 no integer values which would give us 1.
 -/
@@ -203,6 +204,8 @@ def add_monoid_foldr
 | (h::t) := add_monoid.add h (add_monoid_foldr t)  
 
 #eval add_monoid_foldr [v1,v2,v3,v4]
+-- This is in line with what is expected for the result
+-- of the vector addition v1+v2+v3+v4
 /-
 6. Required for graduate students,
 optional extra credit for undergrads.
