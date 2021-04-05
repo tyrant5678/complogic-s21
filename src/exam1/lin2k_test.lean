@@ -1,7 +1,6 @@
 import data.real.basic
 import .lin2k
 
-
 -- Let's work with rational number field
 abbreviation K := ℚ  
 
@@ -18,8 +17,12 @@ vectr with values (4,6), (-6,2), and
 -/
 
 -- HERE
-def v1 : vectr := vectr 3 6
-#reduce v1
+def v1 : vectr := prod.mk 4 6
+def v2 : vectr := prod.mk (-6) 2
+def v3 : vectr := prod.mk 3 (-7)
+#eval v1
+#eval v2
+#eval v3
 /-
 1B. [10 points]
 
@@ -37,7 +40,8 @@ v2 + (-1:K) • v1.)
 -/
 
 -- HERE 
-
+def v4 : vectr := 2*v1 - v2 +v3
+#eval v4
 /-
 Compute the correct answer by hand
 here, showing your work, and check
@@ -46,6 +50,11 @@ answer.
 
 -- HERE
 
+-- 2*v1 = (8,12)
+-- v2= (6,-2)
+-- v3 = (3,-7)
+-- 2v1+v2+v3 = (8,12)+(6,-2)+(3,-7)=(17,3)
+-- This matches up with eval
 -/
 
 /-
@@ -114,7 +123,33 @@ table, write the multiplicative inverses.
 -/
 
 -- HERE
+/-
+ ADDITIVE INVERSE TABLE
+====|=====|
+0   | 0   |
+-----------
+1   | 4   |
+-----------
+2   | 3   |
+-----------
+3   | 2   |
+-----------
+4   | 1   |
+-----------
 
+MULTIPLICATIVE INVERSE TABLE
+====|=====|
+0   | 0   |
+-----------
+1   | 1   |
+-----------
+2   | 3   |
+-----------
+3   | 2   |
+-----------
+4   | 4   |
+-----------
+-/
 /-
 4. [15 points]
 Is the integers mod 4 a field? If so,
@@ -127,7 +162,13 @@ inverse, and briefly explain why.
 -/
 
 -- HERE
-
+/-
+2 is not a field because 2 does not have a multiplicative
+inverse which is also contained within the set. The possible options for
+multiples are 0,1,2, and 3. 0•2=0≠1, 1•2=2≠1, 2•2=4%4=0≠1, 2•3=6%4=2≠1
+Therefore, we have exhaustively shown that this cannot be a field as there are
+no integer values which would give us 1.
+-/
 /-
 5. [20 points]
 Write a function, sum_vectrs, that 
@@ -151,9 +192,17 @@ above, compute the expected sum, and
 show that your function returns the 
 expected/correct result.
 -/
-
+ universe u
 -- HERE
+def add_monoid_foldr 
+  {α : Type u} 
+  [add_monoid α] 
+  :
+  list α → α 
+| [] := has_zero.zero
+| (h::t) := add_monoid.add h (add_monoid_foldr t)  
 
+#eval add_monoid_foldr [v1,v2,v3,v4]
 /-
 6. Required for graduate students,
 optional extra credit for undergrads.
