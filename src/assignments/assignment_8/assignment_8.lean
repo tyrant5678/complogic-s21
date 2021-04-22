@@ -13,17 +13,17 @@ light of these changes in the software about which it proves
 that property. Hint: Be sure to add a state argument everywhere
 one is needed. Here's the original proof. Just fix it here.
 -/
-example : ∀ (e1 e2 : bool_expr), 
-  bool_eval (e1 ∧ e2) = bool_eval (e2 ∧ e1) 
+example : ∀ (e1 e2 : bool_expr) (st: bool_var → bool), 
+  bool_eval (e1 ∧ e2) st = bool_eval (e2 ∧ e1) st
   :=
 begin
-  assume e1 e2,
+  assume e1 e2 st,
   simp [bool_eval],
-  cases (bool_eval e1),
-  cases (bool_eval e2),
+  cases (bool_eval e1 st),
+  cases (bool_eval e2 st),
   apply rfl,
   apply rfl,
-  cases (bool_eval e2),
+  cases (bool_eval e2 st),
   repeat {apply rfl},
 end
 
@@ -54,7 +54,15 @@ find that they really do find bugs in code!
 example : ∀ (e1 e2 : bool_expr) (st: bool_var → bool), 
   bool_eval (¬e1 ∨ e2) st = bool_eval (e1 => e2) st  := 
 begin
-  -- your answer
+  assume e1 e2 st,
+  simp [bool_eval],
+  cases (bool_eval e1 st),
+  cases (bool_eval e2 st),
+  apply rfl,
+  apply rfl,
+  cases (bool_eval e2 st),
+  apply rfl,
+  apply rfl,
 end
 
 
@@ -122,7 +130,14 @@ by ∨, ¬, and =>, respectively, and include comments like the ones just
 above under each new constructor to explain what it specifies. Just
 add your additional constructors to the preceding code in this file.
 -/
+| or_sem : ∀ (e1 e2 : bool_expr) (st : bool_var → bool) (b1 b2 : bool),
+      bool_sem st e1 b1 → bool_sem st e2 b2 → bool_sem st (e1 ∨ e2) (b1 || b2)
 
+| not_sem : ∀ (e1 : bool_expr) (st : bool_var → bool) (b1 : bool),
+      bool_sem st e1 b1 → bool_sem st (¬e1) (¬b1)
+
+| imp_sem : ∀ (e1 e2 : bool_expr) (st : bool_var → bool) (b1 b2 : bool),
+      bool_sem st e1 b1 → bool_sem st e2 b2 → bool_sem st (e1 => e2) (bimp b1 b2)
 /- 3B. Challenging. Extra credit for undergraduates. Required for
 graduate students. Here you are asked to prove that for any two
 expressions, e1 and e2, any state, st, and any Boolean value, v,
@@ -197,3 +212,34 @@ in any state.
 -/
 
 -- HERE
+inductive a_var : Type
+| mk (n : nat)
+
+inductive a_expr : Type
+| lit_expr : nat → a_expr 
+| var_expr : a_var → a_expr 
+| add_expr : a_expr → a_expr → a_expr
+| mul_expr : a_expr → a_expr → a_expr
+| div_expr : a_expr → a_expr → a_expr
+| min_expr : a_expr → a_expr → a_expr
+
+open a_expr 
+
+notation e1 + e2 := add_expr e1 e2
+notation e1 - e2 := min_expr e1 e2
+notation e1 * e2 := mul_expr e1 e2
+notation e1 / e2 := div_expr e1 e2
+notation `[` n `]` := a_expr.lit_expr n
+notation `[` v `]` := a_expr.var_expr v
+
+inductive arith_sem : (a_var → nat) → a_expr → nat → Prop
+| lit_sem (n : nat) (e : a_expr) (st : a_var → nat) : arith_sem st [n] n
+| var_sem (v : a_var) (e : a_expr) (st : a_var → nat) : arith_sem st [v] (st v)
+| add_sem : ∀ (a1 a2 : a_expr) (st : a_var → nat) (n1 n2 : nat),
+      arith_sem st a1 n1 → arith_sem st a2 n2 → arith_sem st (a1 + a2) (n1 + n2)
+| min_sem : ∀ (a1 a2 : a_expr) (st : a_var → nat) (n1 n2 : nat),
+      arith_sem st a1 n1 → arith_sem st a2 n2 → arith_sem st (a1-a2) (n1-n2)
+| mul_sem : ∀ (a1 a2 : a_expr) (st : a_var → nat) (n1 n2 : nat),
+      arith_sem st a1 n1 → arith_sem st a2 n2 → arith_sem st (a1*a2) (n1*n2)
+| div_sem : ∀ (a1 a2 : a_expr) (st : a_var → nat) (n1 n2 : nat),
+      arith_sem st a1 n1 → arith_sem st a2 n2 → arith_sem st (a1/a2) (n1/n2)
